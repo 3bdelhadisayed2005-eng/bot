@@ -7,15 +7,20 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # --- ⚠️ إعدادات البوت والـ API والتحكم (ضع بياناتك هنا) ---
 BOT_TOKEN = "8079896033:AAGC8LigHHqLLK1uc8mJDVyRAw8_7eosLzk"      # توكن البوت الخاص بك من BotFather
-USER_NAME = "Abdelhadisayed"    # اسم حسابك الفعلي في موقع Durian
-API_TOKEN = "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"   # الـ API Key بتاعك
+ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في التليجرام
 PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح 🎯
-ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في التليجرام (أرقام فقط)
-SUPPORT_URL = "t.me/abdelhadisayed" # رابط حساب الدعم بتاعك أو حسابك الشخصي
+SUPPORT_URL = "t.me/abdelhadisayed" # رابط حسابك الشخصي أو الدعم
+
+# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتبهم هنا بالترتيب) 🎯
+DURIAN_ACCOUNTS = [
+    {"Abdelhadisayed": "الحساب_الاول", "api_key": "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"},
+    {"Abdelhadi2005": "الحساب_الثاني", "api_key": "RStqT2cvR2dMMTNPVVFaMU9DYXdQdz09"},
+    {"3bdelhadisayed": "الحساب_الثالث", "api_key": "N3BIVTV2OWxheFFYenpFL0NrbW45Zz09"}
+]
 
 # 💰 إعدادات فودافون كاش اليدوي
 USD_TO_EGP_RATE = 50.0              # سعر الدولار مقابل الجنيه جوه البوت
-VODAFONE_NUMBER = "01028520360"       # رقم فودافون كاش بتاعك اللي الزباين هتحول عليه
+VODAFONE_NUMBER = "01028520360"       # رقم فودافون كاش بتاعك
 # ---------------------------------------------------
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -47,7 +52,6 @@ def save_balances():
 
 load_balances()
 
-# 🌍 جدول الدول المحدث بالدول الجديدة 🚀
 ALL_COUNTRIES = {
     "الأرجنتين": {"code": "ar", "price": 0.25, "flag": "🇦🇷"},
     "تونس": {"code": "tn", "price": 0.25, "flag": "🇹🇳"},
@@ -164,8 +168,8 @@ def handle_callbacks(call):
             f"📥 <b>خطوات تفعيل الرصيد:</b>\n"
             f"1️⃣ قم بتحويل المبلغ على الرقم أعلاه.\n"
             f"2️⃣ خذ لقطة شاشة (سكرين شوت) للتحويل.\n"
-            f"3️⃣ اضغط على زر <b>'👨‍💻 إرسال التحويل للمشرف'</b> بالأسفل وأرسل له السكرين شوت مع الـ ID الخاص بك لكي يشحن محفظتك فوراً.\n\n"
-            f"🆔 الـ ID الخاص بك لتسليمه للمشرف: <code>{user_id}</code>"
+            f"3️⃣ أرسل السكرين مع الـ ID الخاص بك لكي يشحن محفظتك فوراً.\n\n"
+            f"🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         )
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("👨‍💻 إرسال التحويل للمشرف", url=SUPPORT_URL))
@@ -201,7 +205,10 @@ def handle_callbacks(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
     
     elif call.data.startswith("claim_"):
-        phone = call.data.split("_")[1]
+        parts = call.data.split("_")
+        phone = parts[1]
+        acc_index = int(parts[2]) # معرفة الحساب اللي جاب الرقم
+        
         if phone in active_hunted_numbers:
             target_info = active_hunted_numbers[phone]
             price = float(target_info['price'])
@@ -213,10 +220,10 @@ def handle_callbacks(call):
                 bot.edit_message_text(
                     chat_id=call.message.chat.id, 
                     message_id=call.message.id, 
-                    text=f"🎰 <b>الدولة متاحة الآن</b> 🥳\n\n{target_info['flag']} {target_info['country']}\n📱 الرقم المحجوز: <code>{phone}</code>\n\n🔄 جاري انتظار كود الـ SMS من السيرفر الصيني...\n⚠️ <b>تنبيه:</b> لن يتم خصم الـ {price:.2f}$ من محفظتك إلا بعد وصول الكود بنجاح! 👍",
+                    text=f"🎰 <b>الدولة متاحة الآن</b> 🥳\n\n{target_info['flag']} {target_info['country']}\n📱 الرقم المحجوز: <code>{phone}</code>\n\n🔄 جاري انتظار كود الـ SMS من السيرفر الصيني...\n⚠️ لن يتم الخصم إلا بعد وصول الكود بنجاح! 👍",
                     parse_mode="HTML"
                 )
-                threading.Thread(target=wait_for_sms, args=(user_id, phone, price)).start()
+                threading.Thread(target=wait_for_sms, args=(user_id, phone, price, acc_index)).start()
             else:
                 bot.answer_callback_query(call.id, "❌ رصيدك غير كافٍ لإتمام عملية الحجز!", show_alert=True)
         else:
@@ -226,59 +233,67 @@ def handle_callbacks(call):
 def handle_text_messages(message):
     user_id = message.from_user.id
     if user_id != ADMIN_ID:
-        bot.reply_to(message, "❓ خيار غير معروف. يرجى استخدام أزرار التحكم بالأسفل لشراء الأرقام أو الشحن.", reply_markup=get_main_keyboard())
+        bot.reply_to(message, "❓ خيار غير معروف. يرجى استخدام أزرار التحكم بالأسفل.", reply_markup=get_main_keyboard())
 
-def release_bad_number(phone_number):
+def release_bad_number(phone_number, acc_index):
+    acc = DURIAN_ACCOUNTS[acc_index]
     try:
-        url = f"https://api.durianrcs.com/out/ext_api/cancelMobile?name={USER_NAME}&ApiKey={API_TOKEN}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+        url = f"https://api.durianrcs.com/out/ext_api/cancelMobile?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
         requests.get(url, timeout=5)
     except: pass
 
-def is_number_banned_on_telegram(phone_number):
+def is_number_banned_on_telegram(phone_number, acc_index):
+    acc = DURIAN_ACCOUNTS[acc_index]
     try:
-        check_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={USER_NAME}&ApiKey={API_TOKEN}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+        check_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
         res = requests.get(check_url, timeout=4).json()
         if res.get("code") == 905 or "block" in str(res).lower() or "ban" in str(res).lower():
             return True
     except: pass
     return False
 
+# 🔄 دالة الصيد المتطور بالتناوب الذكي بين الـ 3 حسابات معاً 🚀
 def global_auto_buyer():
     global hunting_active
     hunting_active = True
     while hunting_active:
         for name, info in list(ALL_COUNTRIES.items()):
             country_code = info["code"]
-            try:
-                url = f"https://api.durianrcs.com/out/ext_api/getMobile?name={USER_NAME}&ApiKey={API_TOKEN}&cuy={country_code}&pid={PROJECT_ID}&num=1&noblack=1&serial=2"
-                response = requests.get(url, timeout=5)
-                
-                if response.status_code == 200:
-                    res_json = response.json()
-                    if res_json.get("code") == 200:
-                        phone_number = res_json.get("data")
-                        
-                        if is_number_banned_on_telegram(phone_number):
-                            release_bad_number(phone_number)
-                            continue
+            
+            # اللف على الـ 3 حسابات بالتناوب للسحب من أي حساب متاح فيه رصيد
+            for idx, acc in enumerate(DURIAN_ACCOUNTS):
+                try:
+                    url = f"https://api.durianrcs.com/out/ext_api/getMobile?name={acc['username']}&ApiKey={acc['api_key']}&cuy={country_code}&pid={PROJECT_ID}&num=1&noblack=1&serial=2"
+                    response = requests.get(url, timeout=4)
+                    
+                    if response.status_code == 200:
+                        res_json = response.json()
+                        if res_json.get("code") == 200:
+                            phone_number = res_json.get("data")
                             
-                        c_name, price, flag = get_country_info_by_code(country_code)
-                        active_hunted_numbers[phone_number] = {"country": c_name, "flag": flag, "price": price}
-                        
-                        for u_id, targets in list(user_hunting_targets.items()):
-                            if country_code in targets:
-                                markup = InlineKeyboardMarkup()
-                                markup.add(InlineKeyboardButton("🛒 شراء الآن", callback_data=f"claim_{phone_number}"))
-                                formatted_msg = f"🥳 🎰 **الدولة متاحة الآن**\n\n{flag} {c_name}\n✅ رقم جاهز تماماً وفريش!\n💰 سعر الشراء: **${price:.2f}**\n\n🛒 اضغط شراء الآن لحجزه فوراً"
-                                bot.send_message(u_id, formatted_msg, reply_markup=markup, parse_mode="Markdown")
-                                user_hunting_targets[u_id].remove(country_code)
-            except Exception as e:
-                print(f"⚠️ عطل شبكة مؤقت في دالة الصيد، جاري التخطي: {e}")
-            time.sleep(2.5)
-        time.sleep(2)
+                            if is_number_banned_on_telegram(phone_number, idx):
+                                release_bad_number(phone_number, idx)
+                                continue
+                                
+                            c_name, price, flag = get_country_info_by_code(country_code)
+                            active_hunted_numbers[phone_number] = {"country": c_name, "flag": flag, "price": price}
+                            
+                            for u_id, targets in list(user_hunting_targets.items()):
+                                if country_code in targets:
+                                    markup = InlineKeyboardMarkup()
+                                    markup.add(InlineKeyboardButton("🛒 شراء الآن", callback_data=f"claim_{phone_number}_{idx}"))
+                                    formatted_msg = f"🥳 🎰 **الدولة متاحة الآن**\n\n{flag} {c_name}\n✅ رقم جاهز وفريش تماماً!\n💰 سعر الشراء: **${price:.2f}**\n\n🛒 اضغط شراء الآن لحجزه فوراً"
+                                    bot.send_message(u_id, formatted_msg, reply_markup=markup, parse_mode="Markdown")
+                                    user_hunting_targets[u_id].remove(country_code)
+                            break # الخروج من لفة الحسابات والانتقال للدولة التالية طالما وجدنا رقم
+                except: pass
+                time.sleep(1) # فاصل صغير جداً بين الحسابات لعدم الحظر
+            time.sleep(2)
+        time.sleep(1)
 
-def wait_for_sms(user_id, phone_number, price):
-    sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={USER_NAME}&ApiKey={API_TOKEN}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+def wait_for_sms(user_id, phone_number, price, acc_index):
+    acc = DURIAN_ACCOUNTS[acc_index]
+    sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
     for _ in range(20): 
         try:
             time.sleep(15)
@@ -297,13 +312,13 @@ def wait_for_sms(user_id, phone_number, price):
                 )
                 return
         except: pass
-    bot.send_message(user_id, f"⚠️ انتهى وقت انتظار الـ SMS للرقم `{phone_number}`.\n❌ **تم إلغاء الطلب تلقائياً ولم يتم خصم أي سنت من رصيدك.**")
+    bot.send_message(user_id, f"⚠️ انتهى وقت انتظار الـ SMS للرقم `{phone_number}`.\n❌ تم إلغاء الطلب تلقائياً ولم يتم خصم شيء.")
 
 def process_admin_target_id(message, action):
     try:
         target_id = int(message.text.strip())
         admin_state[message.from_user.id] = {"action": action, "target_user": target_id}
-        msg = bot.send_message(message.chat.id, "💰 أدخل القيمة بالدولار الآن (مثال: 1 أو 2.5):")
+        msg = bot.send_message(message.chat.id, "💰 أدخل القيمة بالدولار الآن:")
         bot.register_next_step_handler(msg, process_admin_amount)
     except: bot.send_message(message.chat.id, "❌ الـ ID غير صحيح.")
 
@@ -326,7 +341,7 @@ def process_admin_amount(message):
                 save_balances()
                 bot.send_message(admin_id, f"✅ تم خصم {amount}$ بنجاح من حساب {target_id}!")
             del admin_state[admin_id]
-        except: bot.send_message(message.chat.id, "❌ خطأ في القيمة المكتوبة.")
+        except: bot.send_message(message.chat.id, "❌ خطأ في القيمة.")
 
 def process_admin_clear_id(message):
     try:
@@ -347,7 +362,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون.")
 
 def run_bot_safe():
-    print("🤖 جاري بدء تشغيل البوت المحدث بالدول الجديدة والشحن اليدوي...")
+    print("🤖 جاري بدء تشغيل بوت الصيد الثلاثي المتزامن والشحن اليدوي...")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     
     while True:
