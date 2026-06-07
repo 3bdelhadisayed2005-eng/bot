@@ -11,7 +11,7 @@ ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في
 PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح بالصفر 🎯
 SUPPORT_URL = "t.me/abdelhadisayed" # رابط حسابك الشخصي أو الدعم
 
-# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتب أسامي حساباتك والـ APIs مكان الكلام العربي وسيب الباقي زي ما هو)
+# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتب بياناتك وسيب الأقواس والترتيب زي ما هو)
 DURIAN_ACCOUNTS = [
     ["Abdelhadisayed", "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"],
     ["3bdelhadisayed", "N3BIVTV2OWxheFFYenpFL0NrbW45Zz09"],
@@ -52,26 +52,38 @@ def save_balances():
 
 load_balances()
 
+# 🌍 جدول الـ 30 دولة مأخوذ من صورتك بالملي مع أكواد السيرفر الصيني الصحيحة 🚀
 ALL_COUNTRIES = {
-    "الأرجنتين": {"code": "ar", "price": 0.25, "flag": "🇦🇷"},
-    "تونس": {"code": "tn", "price": 0.25, "flag": "🇹🇳"},
     "مصر": {"code": "eg", "price": 0.25, "flag": "🇪🇬"},
     "روسيا": {"code": "ru", "price": 0.25, "flag": "🇷🇺"},
     "أمريكا": {"code": "us", "price": 0.25, "flag": "🇺🇸"},
+    "الهند": {"code": "in", "price": 0.25, "flag": "🇮🇳"},
+    "جنوب إفريقيا": {"code": "tz", "price": 0.25, "flag": "🇿🇦"},
+    "نيجيريا": {"code": "ng", "price": 0.25, "flag": "🇳🇬"},
     "تايلاند": {"code": "th", "price": 0.25, "flag": "🇹🇭"},
-    "الإمارات": {"code": "ae", "price": 0.25, "flag": "🇦🇪"},
-    "سوريا": {"code": "sy", "price": 0.25, "flag": "🇸🇾"},
-    "فرنسا": {"code": "fr", "price": 0.25, "flag": "🇫🇷"},
-    "بورتوريكو": {"code": "pr", "price": 0.25, "flag": "🇵🇷"},
-    "فيجي": {"code": "fj", "price": 0.25, "flag": "🇫🇯"},
+    "الكونغو الديمقراطية": {"code": "cd", "price": 0.25, "flag": "🇨🇩"},
+    "أنغولا": {"code": "ao", "price": 0.25, "flag": "🇦🇴"},
     "أفغانستان": {"code": "af", "price": 0.25, "flag": "🇦🇫"},
-    "الأردن": {"code": "jo", "price": 0.25, "flag": "🇯🇴"},
-    "الجزائر": {"code": "dz", "price": 0.25, "flag": "🇩🇿"},
-    "أستراليا": {"code": "au", "price": 0.25, "flag": "🇦🇺"},
-    "سلوفاكيا": {"code": "sk", "price": 0.25, "flag": "🇸🇰"},
-    "إسبانيا": {"code": "es", "price": 0.25, "flag": "🇪🇸"},
-    "ألمانيا": {"code": "de", "price": 0.25, "flag": "🇩🇪"},
-    "موريتانيا": {"code": "mr", "price": 0.25, "flag": "🇲🇷"}
+    "تنزانيا": {"code": "tz", "price": 0.25, "flag": "🇹🇿"},
+    "جمهورية الدومينيكان": {"code": "do", "price": 0.25, "flag": "🇩🇴"},
+    "المكسيك": {"code": "mx", "price": 0.25, "flag": "🇲🇽"},
+    "موزمبيق": {"code": "mz", "price": 0.25, "flag": "🇲🇿"},
+    "الكاميرون": {"code": "cm", "price": 0.25, "flag": "🇨🇲"},
+    "السنغال": {"code": "sn", "price": 0.25, "flag": "🇸🇳"},
+    "كينيا": {"code": "ke", "price": 0.25, "flag": "🇰🇪"},
+    "الكونغو": {"code": "cg", "price": 0.25, "flag": "🇨🇬"},
+    "ليبيا": {"code": "ly", "price": 0.25, "flag": "🇱🇾"},
+    "موريتانيا": {"code": "mr", "price": 0.25, "flag": "🇲🇷"},
+    "باكستان": {"code": "pk", "price": 0.25, "flag": "🇵🇰"},
+    "الفلبين": {"code": "ph", "price": 0.25, "flag": "🇵🇭"},
+    "أوغندا": {"code": "ug", "price": 0.25, "flag": "🇺🇬"},
+    "زامبيا": {"code": "zm", "price": 0.25, "flag": "🇿🇲"},
+    "توغو": {"code": "tg", "price": 0.25, "flag": "🇹🇬"},
+    "كمبوديا": {"code": "kh", "price": 0.25, "flag": "🇰🇭"},
+    "بوركينا فاسو": {"code": "bf", "price": 0.25, "flag": "🇧🇫"},
+    "هايتي": {"code": "ht", "price": 0.25, "flag": "🇭🇹"},
+    "مالاوي": {"code": "mw", "price": 0.25, "flag": "🇲🇼"},
+    "إثيوبيا": {"code": "et", "price": 0.25, "flag": "🇪🇹"}
 }
 
 active_hunted_numbers = {} 
@@ -96,16 +108,15 @@ def get_admin_dashboard_keyboard():
 
 def get_main_keyboard():
     markup = InlineKeyboardMarkup(row_width=2)
-    markup.add(InlineKeyboardButton("🛒 شراء حساب", callback_data="buy_account"))
-    markup.add(InlineKeyboardButton("💰 إيداع / شحن", callback_data="deposit"), InlineKeyboardButton("👨‍💻 التواصل مع الدعم", url=SUPPORT_URL))
     markup.add(InlineKeyboardButton("🎯 تفعيل الصيد التلقائي", callback_data="manage_hunting"))
+    markup.add(InlineKeyboardButton("💰 إيداع / شحن", callback_data="deposit"), InlineKeyboardButton("👨‍💻 التواصل مع الدعم", url=SUPPORT_URL))
     return markup
 
 def get_countries_keyboard(user_id, page=0):
     markup = InlineKeyboardMarkup(row_width=2)
     user_targets = user_hunting_targets.get(user_id, [])
     items = list(ALL_COUNTRIES.items())
-    per_page = 14  
+    per_page = 10  # خليناها 10 عشان يستوعب الـ 30 دولة في 3 صفحات نظيفة ومنظمة 📄
     start = page * per_page
     end = start + per_page
     
@@ -177,7 +188,7 @@ def handle_callbacks(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=deposit_text, reply_markup=markup, parse_mode="HTML")
         return
 
-    if call.data == "manage_hunting" or call.data == "buy_account":
+    if call.data == "manage_hunting":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="🌍 **قسم الصيد التلقائي لأرقام التليجرام:**", reply_markup=get_countries_keyboard(user_id, page=0), parse_mode="Markdown")
     elif call.data.startswith("hpage_"):
@@ -250,11 +261,22 @@ def global_auto_buyer():
     global hunting_active
     hunting_active = True
     while hunting_active:
+        active_codes = set()
+        for targets in user_hunting_targets.values():
+            for code in targets:
+                active_codes.add(code)
+                
+        if not active_codes:
+            time.sleep(1)
+            continue
+
         for name, info in list(ALL_COUNTRIES.items()):
             country_code = info["code"]
             
+            if country_code not in active_codes:
+                continue
+            
             for idx, acc in enumerate(DURIAN_ACCOUNTS):
-                # تخطي الخانات الافتراضية الذكي
                 if "اسم_الحساب" in acc[0] or "مفتاح_API" in acc[1]:
                     continue
                 try:
@@ -266,7 +288,7 @@ def global_auto_buyer():
                         code = res_json.get("code")
                         msg = res_json.get("msg", "No message")
                         
-                        print(f"📡 [Durian Check] Account: {acc[0]} | Country: {name} | Response Code: {code} | Msg: {msg}")
+                        print(f"🎯 [صيد مركز] Account: {acc[0]} | Country: {name} | Code: {code} | Msg: {msg}")
                         
                         if code == 200:
                             phone_number = res_json.get("data")
@@ -287,9 +309,8 @@ def global_auto_buyer():
                             break
                 except Exception as e:
                     print(f"⚠️ Network error on buyer thread: {e}")
-                time.sleep(0.8)
-            time.sleep(1.5)
-        time.sleep(1)
+                time.sleep(0.5)
+            time.sleep(0.5)
 
 def wait_for_sms(user_id, phone_number, price, acc_index):
     acc = DURIAN_ACCOUNTS[acc_index]
@@ -362,7 +383,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون.")
 
 def run_bot_safe():
-    print("🤖 جاري تشغيل السيستم بنظام حماية الحسابات الحديدي والمؤمن تماماً...")
+    print("🤖 جاري تشغيل سيستم الصيد الـ 30 دولة المتوافق تماماً مع قائمة موقع Durian...")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     
     while True:
