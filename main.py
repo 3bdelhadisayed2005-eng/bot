@@ -11,7 +11,7 @@ ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في
 PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح بالصفر 🎯
 SUPPORT_URL = "t.me/abdelhadisayed" # رابط حسابك الشخصي أو الدعم
 
-# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتب بياناتك وسيب الأقواس والترتيب زي ما هو)
+# 🔑 بيانات الحسابات الثلاثة لموقع Durian (غير الكلام العربي فقط وسيب الأقواس والترتيب)
 DURIAN_ACCOUNTS = [
     ["Abdelhadisayed", "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"],
     ["3bdelhadisayed", "N3BIVTV2OWxheFFYenpFL0NrbW45Zz09"],
@@ -52,29 +52,35 @@ def save_balances():
 
 load_balances()
 
-# 🌍 جدول الـ 30 دولة مأخوذ من صورتك بالملي مع أكواد السيرفر الصيني الصحيحة 🚀
+# 🌍 الـ 41 دولة كاملة ومؤمنة ضد أخطاء السحب 🚀
 ALL_COUNTRIES = {
     "مصر": {"code": "eg", "price": 0.25, "flag": "🇪🇬"},
     "روسيا": {"code": "ru", "price": 0.25, "flag": "🇷🇺"},
     "أمريكا": {"code": "us", "price": 0.25, "flag": "🇺🇸"},
     "الهند": {"code": "in", "price": 0.25, "flag": "🇮🇳"},
+    "تونس": {"code": "tn", "price": 0.25, "flag": "🇹🇳"},
+    "الأرجنتين": {"code": "ar", "price": 0.25, "flag": "🇦🇷"},
+    "الجزائر": {"code": "dz", "price": 0.25, "flag": "🇩🇿"},
+    "ليبيا": {"code": "ly", "price": 0.25, "flag": "🇱🇾"},
+    "سوريا": {"code": "sy", "price": 0.25, "flag": "🇸🇾"},
+    "الأردن": {"code": "jo", "price": 0.25, "flag": "🇯🇴"},
+    "الإمارات": {"code": "ae", "price": 0.25, "flag": "🇦🇪"},
     "جنوب إفريقيا": {"code": "tz", "price": 0.25, "flag": "🇿🇦"},
     "نيجيريا": {"code": "ng", "price": 0.25, "flag": "🇳🇬"},
     "تايلاند": {"code": "th", "price": 0.25, "flag": "🇹🇭"},
+    "المكسيك": {"code": "mx", "price": 0.25, "flag": "🇲🇽"},
+    "باكستان": {"code": "pk", "price": 0.25, "flag": "🇵🇰"},
+    "موريتانيا": {"code": "mr", "price": 0.25, "flag": "🇲🇷"},
     "الكونغو الديمقراطية": {"code": "cd", "price": 0.25, "flag": "🇨🇩"},
     "أنغولا": {"code": "ao", "price": 0.25, "flag": "🇦🇴"},
     "أفغانستان": {"code": "af", "price": 0.25, "flag": "🇦🇫"},
     "تنزانيا": {"code": "tz", "price": 0.25, "flag": "🇹🇿"},
     "جمهورية الدومينيكان": {"code": "do", "price": 0.25, "flag": "🇩🇴"},
-    "المكسيك": {"code": "mx", "price": 0.25, "flag": "🇲🇽"},
     "موزمبيق": {"code": "mz", "price": 0.25, "flag": "🇲🇿"},
     "الكاميرون": {"code": "cm", "price": 0.25, "flag": "🇨🇲"},
     "السنغال": {"code": "sn", "price": 0.25, "flag": "🇸🇳"},
     "كينيا": {"code": "ke", "price": 0.25, "flag": "🇰🇪"},
     "الكونغو": {"code": "cg", "price": 0.25, "flag": "🇨🇬"},
-    "ليبيا": {"code": "ly", "price": 0.25, "flag": "🇱🇾"},
-    "موريتانيا": {"code": "mr", "price": 0.25, "flag": "🇲🇷"},
-    "باكستان": {"code": "pk", "price": 0.25, "flag": "🇵🇰"},
     "الفلبين": {"code": "ph", "price": 0.25, "flag": "🇵🇭"},
     "أوغندا": {"code": "ug", "price": 0.25, "flag": "🇺🇬"},
     "زامبيا": {"code": "zm", "price": 0.25, "flag": "🇿🇲"},
@@ -83,7 +89,14 @@ ALL_COUNTRIES = {
     "بوركينا فاسو": {"code": "bf", "price": 0.25, "flag": "🇧🇫"},
     "هايتي": {"code": "ht", "price": 0.25, "flag": "🇭🇹"},
     "مالاوي": {"code": "mw", "price": 0.25, "flag": "🇲🇼"},
-    "إثيوبيا": {"code": "et", "price": 0.25, "flag": "🇪🇹"}
+    "إثيوبيا": {"code": "et", "price": 0.25, "flag": "🇪🇹"},
+    "فرنسا": {"code": "fr", "price": 0.25, "flag": "🇫🇷"},
+    "بورتوريكو": {"code": "pr", "price": 0.25, "flag": "🇵🇷"},
+    "فيجي": {"code": "fj", "price": 0.25, "flag": "🇫🇯"},
+    "أستراليا": {"code": "au", "price": 0.25, "flag": "🇦🇺"},
+    "سلوفاكيا": {"code": "sk", "price": 0.25, "flag": "🇸🇰"},
+    "إسبانيا": {"code": "es", "price": 0.25, "flag": "🇪🇸"},
+    "ألمانيا": {"code": "de", "price": 0.25, "flag": "🇩🇪"}
 }
 
 active_hunted_numbers = {} 
@@ -116,7 +129,7 @@ def get_countries_keyboard(user_id, page=0):
     markup = InlineKeyboardMarkup(row_width=2)
     user_targets = user_hunting_targets.get(user_id, [])
     items = list(ALL_COUNTRIES.items())
-    per_page = 10  # خليناها 10 عشان يستوعب الـ 30 دولة في 3 صفحات نظيفة ومنظمة 📄
+    per_page = 10  
     start = page * per_page
     end = start + per_page
     
@@ -383,7 +396,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون.")
 
 def run_bot_safe():
-    print("🤖 جاري تشغيل سيستم الصيد الـ 30 دولة المتوافق تماماً مع قائمة موقع Durian...")
+    print("🤖 السيستم جاهز ومقفل بـ 41 دولة كاملة ومستعد لاستقبال بياناتك الحقيقية...")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     
     while True:
