@@ -3,15 +3,20 @@ import requests
 import threading
 import time
 import os
+import re
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # --- ⚠️ إعدادات البوت والـ API والتحكم (ضع بياناتك هنا) ---
-BOT_TOKEN = "8079896033:AAGC8LigHHqLLK1uc8mJDVyRAw8_7eosLzk"      # توكن البوت الخاص بك من BotFather
+BOT_TOKEN = "ضع_توكن_البوت_هنا"      # 8079896033:AAGC8LigHHqLLK1uc8mJDVyRAw8_7eosLzk BotFather
 USER_NAME = "Abdelhadisayed"    # اسم حسابك الفعلي في موقع Durian
-API_TOKEN = "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"   # الـ API Key بتاعك (atc0qUJVmGOQK+ZyCC16kA==)
+API_TOKEN = "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"   # الـ API Key بتاعك
 PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح 🎯
 ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في التليجرام
 SUPPORT_URL = "t.me/abdelhadisayed" 
+
+# 💰 إعدادات فودافون كاش التلقائي
+USD_TO_EGP_RATE = 50.0              # سعر الدولار مقابل الجنيه جوه البوت (عدله براحتك)
+VODAFONE_NUMBER = "01028520360"       # رقم فودافون كاش بتاعك اللي الزباين هتحول عليه
 # ---------------------------------------------------
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -82,7 +87,7 @@ def get_admin_dashboard_keyboard():
 def get_main_keyboard():
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(InlineKeyboardButton("🛒 شراء حساب", callback_data="buy_account"))
-    markup.add(InlineKeyboardButton("💰 إيداع", callback_data="deposit"), InlineKeyboardButton("👨‍💻 التواصل مع الدعم", url=SUPPORT_URL))
+    markup.add(InlineKeyboardButton("💰 إيداع / شحن", callback_data="deposit"), InlineKeyboardButton("👨‍💻 التواصل مع الدعم", url=SUPPORT_URL))
     markup.add(InlineKeyboardButton("🎯 تفعيل الصيد التلقائي", callback_data="manage_hunting"))
     return markup
 
@@ -143,7 +148,23 @@ def handle_callbacks(call):
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=admin_text, reply_markup=get_admin_dashboard_keyboard(), parse_mode="HTML")
             return
 
-    if call.data == "manage_hunting":
+    if call.data == "deposit":
+        bot.answer_callback_query(call.id)
+        deposit_text = (
+            f"💳 <b>قسم الشحن التلقائي (فودافون كاش)</b>\n\n"
+            f"يرجى تحويل المبلغ المراد شحنه إلى الرقم التالي:\n"
+            f"📱 رقم الكاش: <code>{VODAFONE_NUMBER}</code>\n\n"
+            f"⚠️ <b>طريقة تفعيل الرصيد:</b>\n"
+            f"بعد إتمام التحويل بنجاح، قم بعمل <b>نسخ لرسالة شركة فودافون</b> التي تصلك على هاتفك (تم تحويل مبلغ... إلخ) "
+            f"وقم بـ <b>إرسال الرسالة نصياً هنا في شات البوت مباشرة</b>.\n\n"
+            f"💵 سعر تحويل الدولار داخل البوت: 1$ = {USD_TO_EGP_RATE} جنيه."
+        )
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="back_to_main"))
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=deposit_text, reply_markup=markup, parse_mode="HTML")
+        return
+
+    if call.data == "manage_hunting" or call.data == "buy_account":
         bot.answer_callback_query(call.id)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="🌍 **قسم الصيد التلقائي لأرقام التليجرام:**", reply_markup=get_countries_keyboard(user_id, page=0), parse_mode="Markdown")
     elif call.data.startswith("hpage_"):
@@ -192,6 +213,61 @@ def handle_callbacks(call):
         else:
             bot.answer_callback_query(call.id, "❌ الرقم تم بيعه أو انتهت صلاحيته الحجز!", show_alert=True)
 
+# 📲 نظام فك شفرة رسائل فودافون كاش والشحن التلقائي الفوري 💳
+@bot.message_handler(func=lambda message: True)
+def handle_text_messages(message):
+    user_id = message.from_user.id
+    text = message.text.strip()
+    
+    # التحقق من أن الرسالة هي رسالة فودافون كاش الرسمية للتحويل
+    if "تم تحويل" in text and "بنجاح" in text:
+        try:
+            # استخراج المبلغ المالي من الرسالة بالـ Regex الذكي
+            amount_match = re.search(r"مبلغ\s+([\d\.]+)\s+جنيه", text)
+            if amount_match:
+                egp_amount = float(amount_match.group(1))
+                
+                # حساب القيمة بالدولار بناءً على السعر المحدد فوق
+                usd_gained = round(egp_amount / USD_TO_EGP_RATE, 2)
+                
+                if usd_gained > 0:
+                    # إضافة الرصيد لحساب المستخدم فوراً وحفظ التغيير
+                    if user_id not in USER_BALANCES: USER_BALANCES[user_id] = 0.00
+                    USER_BALANCES[user_id] += usd_gained
+                    save_balances()
+                    
+                    # إرسال تأكيد للزبون
+                    bot.reply_to(
+                        message, 
+                        f"✅ <b>تم استلام وتأكيد تحويلك بنجاح!</b>\n"
+                        f"💰 المبلغ المستلم: <code>{egp_amount} جنيه</code>\n"
+                        f"💵 الرصيد المضاف: <code>+{usd_gained}$</code>\n"
+                        f"💳 محفظتك الحالية الآن: <b>{USER_BALANCES[user_id]:.2f}$</b>\n\n"
+                        f"استمتع بالصيد والشراء الفوري! 🎉", 
+                        parse_mode="HTML"
+                    )
+                    
+                    # إشعار للأدمن في نفس اللحظة لمراقبة العمليات
+                    try:
+                        bot.send_message(
+                            ADMIN_ID, 
+                            f"🔔 <b>عملية شحن تلقائي جديدة!</b>\n"
+                            f"👤 الزبون الـ ID: <code>{user_id}</code>\n"
+                            f"📱 اسم المستخدم: @{message.from_user.username or 'بلا اسم'}\n"
+                            f"💰 شحن بمبلغ: <code>{egp_amount} جنيه</code> 👈 عادلت: <code>{usd_gained}$</code>", 
+                            parse_mode="HTML"
+                        )
+                    except: pass
+                    return
+        except Exception as e:
+            print(f"Error parsing VF Cash message: {e}")
+            
+        bot.reply_to(message, "❌ <b>عذراً، لم نتمكن من التحقق من صحة الرسالة!</b> تأكد من نسخها كاملة كما وصلت من الشركة، أو تواصل مع الدعم الفني.", parse_mode="HTML")
+    else:
+        # لو رسالة عادية لا تطابق الفودافون كاش
+        if user_id != ADMIN_ID:
+            bot.reply_to(message, "❓ خيار غير معروف. يرجى استخدام أزرار التحكم بالأسفل.", reply_markup=get_main_keyboard())
+
 def release_bad_number(phone_number):
     try:
         url = f"https://api.durianrcs.com/out/ext_api/cancelMobile?name={USER_NAME}&ApiKey={API_TOKEN}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
@@ -207,7 +283,6 @@ def is_number_banned_on_telegram(phone_number):
     except: pass
     return False
 
-# 🛡️ تم إضافة درع الحماية الذكي لدالة الصيد ضد انقطاع الإنترنت المفاجئ
 def global_auto_buyer():
     global hunting_active
     hunting_active = True
@@ -238,7 +313,6 @@ def global_auto_buyer():
                                 bot.send_message(u_id, formatted_msg, reply_markup=markup, parse_mode="Markdown")
                                 user_hunting_targets[u_id].remove(country_code)
             except Exception as e:
-                # لو حصل أي عطل في النت أثناء الصيد، يتخطى اللفة دي بدون إغلاق البوت
                 print(f"⚠️ عطل شبكة مؤقت في دالة الصيد، جاري التخطي: {e}")
             time.sleep(2.5)
         time.sleep(2)
@@ -312,17 +386,15 @@ def process_admin_broadcast(message):
         except: pass
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون.")
 
-# 🔄 المحرك الخارجي المدرع الذكي: يعيد تشغيل البوت تلقائياً لو النت قطع ثانية ورجع 🚀
 def run_bot_safe():
-    print("🤖 جاري بدء تشغيل البوت بنظام الحماية اللانهائية والـ Auto-Restart ضد أعطال الشبكة...")
+    print("🤖 جاري تشغيل البوت المحدث بدعم الشحن التلقائي فودافون كاش...")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     
     while True:
         try:
             bot.infinity_polling(timeout=20, long_polling_timeout=10)
         except Exception as e:
-            print(f"🚨 تم كشف انقطاع في الإنترنت أو هبوط بالشبكة: {e}")
-            print("⏳ جاري الانتظار 5 ثواني وإعادة تشغيل البوت تلقائياً دبل حماية...")
+            print(f"🚨 عطل شبكة مؤقت: {e}")
             time.sleep(5)
 
 if __name__ == "__main__":
