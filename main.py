@@ -5,17 +5,17 @@ import time
 import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# --- ⚠️ إعدادات البوت والـ API والتحكم (ضع بياناتك هنا) ---
+# --- ⚠️ إعدادات البوت والـ API والتحكم (ضع بياناتك هنا بحرص) ---
 BOT_TOKEN = "8079896033:AAGC8LigHHqLLK1uc8mJDVyRAw8_7eosLzk"      # توكن البوت الخاص بك من BotFather
-ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في التليجرام
-PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح 🎯
+ADMIN_ID = 7087179945                # الـ ID بتاع حسابك أنت في التليجرام (أرقام فقط)
+PROJECT_ID = "0257"                 # كود مشروع التليجرام الصحيح بالصفر 🎯
 SUPPORT_URL = "t.me/abdelhadisayed" # رابط حسابك الشخصي أو الدعم
 
-# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتبهم هنا بالترتيب) 🎯
+# 🔑 بيانات الحسابات الثلاثة لموقع Durian (اكتب أسامي حساباتك والـ APIs مكان الكلام العربي وسيب الباقي زي ما هو)
 DURIAN_ACCOUNTS = [
-    {"Abdelhadisayed": "الحساب_الاول", "api_key": "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"},
-    {"Abdelhadi2005": "الحساب_الثاني", "api_key": "RStqT2cvR2dMMTNPVVFaMU9DYXdQdz09"},
-    {"3bdelhadisayed": "الحساب_الثالث", "api_key": "N3BIVTV2OWxheFFYenpFL0NrbW45Zz09"}
+    ["Abdelhadisayed", "YXRjMHFVSlVtR09RSytaeUNDMTZrQT09"],
+    ["3bdelhadisayed", "N3BIVTV2OWxheFFYenpFL0NrbW45Zz09"],
+    ["Abdelhadi2005", "RStqT2cvR2dMMTNPVVFaMU9DYXdQdz09"]
 ]
 
 # 💰 إعدادات فودافون كاش اليدوي
@@ -167,7 +167,7 @@ def handle_callbacks(call):
             f"💵 حسبة تحويل الدولار داخل البوت: 1$ = {USD_TO_EGP_RATE} جنيه.\n\n"
             f"📥 <b>خطوات تفعيل الرصيد:</b>\n"
             f"1️⃣ قم بتحويل المبلغ على الرقم أعلاه.\n"
-            f"2️⃣ خذ لقطة شاشة (سكرين شوت) للتحويل.\n"
+            f"2️⃣ خذ لقطة شاشة للتحويل.\n"
             f"3️⃣ أرسل السكرين مع الـ ID الخاص بك لكي يشحن محفظتك فوراً.\n\n"
             f"🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         )
@@ -207,7 +207,7 @@ def handle_callbacks(call):
     elif call.data.startswith("claim_"):
         parts = call.data.split("_")
         phone = parts[1]
-        acc_index = int(parts[2]) # معرفة الحساب اللي جاب الرقم
+        acc_index = int(parts[2])
         
         if phone in active_hunted_numbers:
             target_info = active_hunted_numbers[phone]
@@ -229,30 +229,23 @@ def handle_callbacks(call):
         else:
             bot.answer_callback_query(call.id, "❌ الرقم تم بيعه أو انتهت صلاحيته الحجز!", show_alert=True)
 
-@bot.message_handler(func=lambda message: True)
-def handle_text_messages(message):
-    user_id = message.from_user.id
-    if user_id != ADMIN_ID:
-        bot.reply_to(message, "❓ خيار غير معروف. يرجى استخدام أزرار التحكم بالأسفل.", reply_markup=get_main_keyboard())
-
 def release_bad_number(phone_number, acc_index):
     acc = DURIAN_ACCOUNTS[acc_index]
     try:
-        url = f"https://api.durianrcs.com/out/ext_api/cancelMobile?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+        url = f"https://api.durianrcs.com/out/ext_api/cancelMobile?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(PROJECT_ID)}&serial=2"
         requests.get(url, timeout=5)
     except: pass
 
 def is_number_banned_on_telegram(phone_number, acc_index):
     acc = DURIAN_ACCOUNTS[acc_index]
     try:
-        check_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+        check_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(PROJECT_ID)}&serial=2"
         res = requests.get(check_url, timeout=4).json()
         if res.get("code") == 905 or "block" in str(res).lower() or "ban" in str(res).lower():
             return True
     except: pass
     return False
 
-# 🔄 دالة الصيد المتطور بالتناوب الذكي بين الـ 3 حسابات معاً 🚀
 def global_auto_buyer():
     global hunting_active
     hunting_active = True
@@ -260,17 +253,23 @@ def global_auto_buyer():
         for name, info in list(ALL_COUNTRIES.items()):
             country_code = info["code"]
             
-            # اللف على الـ 3 حسابات بالتناوب للسحب من أي حساب متاح فيه رصيد
             for idx, acc in enumerate(DURIAN_ACCOUNTS):
+                # تخطي الخانات الافتراضية الذكي
+                if "اسم_الحساب" in acc[0] or "مفتاح_API" in acc[1]:
+                    continue
                 try:
-                    url = f"https://api.durianrcs.com/out/ext_api/getMobile?name={acc['username']}&ApiKey={acc['api_key']}&cuy={country_code}&pid={PROJECT_ID}&num=1&noblack=1&serial=2"
+                    url = f"https://api.durianrcs.com/out/ext_api/getMobile?name={acc[0]}&ApiKey={acc[1]}&cuy={country_code}&pid={str(PROJECT_ID)}&num=1&noblack=1&serial=2"
                     response = requests.get(url, timeout=4)
                     
                     if response.status_code == 200:
                         res_json = response.json()
-                        if res_json.get("code") == 200:
+                        code = res_json.get("code")
+                        msg = res_json.get("msg", "No message")
+                        
+                        print(f"📡 [Durian Check] Account: {acc[0]} | Country: {name} | Response Code: {code} | Msg: {msg}")
+                        
+                        if code == 200:
                             phone_number = res_json.get("data")
-                            
                             if is_number_banned_on_telegram(phone_number, idx):
                                 release_bad_number(phone_number, idx)
                                 continue
@@ -285,15 +284,16 @@ def global_auto_buyer():
                                     formatted_msg = f"🥳 🎰 **الدولة متاحة الآن**\n\n{flag} {c_name}\n✅ رقم جاهز وفريش تماماً!\n💰 سعر الشراء: **${price:.2f}**\n\n🛒 اضغط شراء الآن لحجزه فوراً"
                                     bot.send_message(u_id, formatted_msg, reply_markup=markup, parse_mode="Markdown")
                                     user_hunting_targets[u_id].remove(country_code)
-                            break # الخروج من لفة الحسابات والانتقال للدولة التالية طالما وجدنا رقم
-                except: pass
-                time.sleep(1) # فاصل صغير جداً بين الحسابات لعدم الحظر
-            time.sleep(2)
+                            break
+                except Exception as e:
+                    print(f"⚠️ Network error on buyer thread: {e}")
+                time.sleep(0.8)
+            time.sleep(1.5)
         time.sleep(1)
 
 def wait_for_sms(user_id, phone_number, price, acc_index):
     acc = DURIAN_ACCOUNTS[acc_index]
-    sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc['username']}&ApiKey={acc['api_key']}&pn={phone_number}&pid={PROJECT_ID}&serial=2"
+    sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(PROJECT_ID)}&serial=2"
     for _ in range(20): 
         try:
             time.sleep(15)
@@ -312,7 +312,7 @@ def wait_for_sms(user_id, phone_number, price, acc_index):
                 )
                 return
         except: pass
-    bot.send_message(user_id, f"⚠️ انتهى وقت انتظار الـ SMS للرقم `{phone_number}`.\n❌ تم إلغاء الطلب تلقائياً ولم يتم خصم شيء.")
+    bot.send_message(user_id, f"⚠️ انتهى وقت انتظار الـ SMS للرقم `{phone_number}`.\n❌ تم إلغاء الطلب تلقائياً.")
 
 def process_admin_target_id(message, action):
     try:
@@ -362,7 +362,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون.")
 
 def run_bot_safe():
-    print("🤖 جاري بدء تشغيل بوت الصيد الثلاثي المتزامن والشحن اليدوي...")
+    print("🤖 جاري تشغيل السيستم بنظام حماية الحسابات الحديدي والمؤمن تماماً...")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     
     while True:
