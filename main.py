@@ -299,7 +299,7 @@ def send_welcome(message):
         )
         bot.send_message(message.chat.id, admin_text, reply_markup=get_admin_dashboard_keyboard(), parse_mode="HTML")
     else:
-        welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>\n\nاختر من الأسفل 👇"
+        welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -310,7 +310,7 @@ def handle_callbacks(call):
     if call.data == "check_join_btn":
         if check_user_joined_channel(user_id):
             bot.answer_callback_query(call.id, "✅ تم تفعيل حسابك بنجاح!", show_alert=True)
-            welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>\n\nاختر من الأسفل 👇"
+            welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
             bot.edit_message_text(chat_id=user_id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         else:
             bot.answer_callback_query(call.id, "❌ لسه مشركتش يا غالي! اشترك الحين.", show_alert=True)
@@ -477,7 +477,6 @@ def handle_callbacks(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         return
     
-    # 🔄 التحديث التفاعلي الجديد في نفس الرسالة ونسبة التحميل الحين! ✨
     elif call.data.startswith("claim_"):
         current_time = time.time()
         last_purchase_time = USER_PURCHASE_COOLDOWN.get(user_id, 0)
@@ -501,19 +500,20 @@ def handle_callbacks(call):
                 USER_BALANCES[user_id] -= price
                 save_data("balances")
                 
-                bot.answer_callback_query(call.id, "🔄 جاري معالجة طلب الشحن في نفس الرسالة الحين...")
+                bot.answer_callback_query(call.id, "🔄 جاري المعالجة الحين...")
                 
-                # 🔄 التعديل فورا على نفس الرسالة لإظهار نسبة الـ 30% وشريط التحميل زي صورتك بالظبط
+                # 🎮 البداية بـ 10% فوراً في نفس الرسالة عشان الأنميشن يبدأ طحن
                 loading_markup = InlineKeyboardMarkup()
-                loading_markup.add(InlineKeyboardButton("30%", callback_data="none"))
+                loading_markup.add(InlineKeyboardButton("10%", callback_data="none"))
                 bot.edit_message_text(
                     chat_id=user_id, 
                     message_id=call.message.id, 
-                    text=f"🔄 <b>جاري محاولة شراء الرقم الحين...</b>\n📱 الرقم: <code>{phone}</code>\n🌍 الدولة: {target_info['flag']} {target_info['country']}", 
+                    text=f"🔄 <b>جاري فحص وحجز الرقم من السيرفر...</b>\n📱 الرقم: <code>{phone}</code>\n🌍 الدولة: {target_info['flag']} {target_info['country']}", 
                     reply_markup=loading_markup, 
                     parse_mode="HTML"
                 )
                 
+                # تفعيل التريد الخاص بالأنميشن السريع والانتظار ⚡
                 threading.Thread(target=wait_for_sms, args=(user_id, phone, price, acc_index, call.message.id, target_info['country'], target_info['flag'])).start()
             else:
                 bot.answer_callback_query(call.id, "❌ رصيدك غير كافٍ!", show_alert=True)
@@ -670,11 +670,23 @@ def global_auto_buyer():
                 time.sleep(0.5)
             time.sleep(0.5)
 
-# ⏱️ دالة الفحص مدمج فيها التحديث الحي والتثبيت التلقائي لكود التليجرام 🔒📌
+# ⏱️ ⚡ دالة الفحص مدمج بها نظام الأنميشن الحجز السريع الخارق (10%.. 20%.. 30%.. ورا بعض) ✨🚀
 def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name, flag):
     acc = DURIAN_ACCOUNTS[acc_index]
     sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(SETTINGS['pid'])}&serial=2"
     
+    # 🎰 1. عمايل تأثير الحجز السريع الخاطف (10% 👈 20% 👈 30% لـ 100% في نفس الثانية) 🎮⚡
+    fake_steps = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    for step in fake_steps:
+        try:
+            progress_markup = InlineKeyboardMarkup()
+            progress_markup.add(InlineKeyboardButton(f"{step}%", callback_data="none"))
+            timer_text = f"🔄 <b>جاري فحص وحجز الرقم من السيرفر الصيني...</b>\n📱 الرقم: <code>{phone_number}</code>\n🌍 الدولة: {flag} {c_name}"
+            bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=progress_markup, parse_mode="HTML")
+            time.sleep(0.15) # سرعة الحركة الأنميشن الخاطفة ورا بعض طحن ⚡
+        except: pass
+
+    # 🎰 2. بعد انتهاء العداد السريع.. نقلب علطول على رسالة انتظار الـ SMS الحقيقية والعد التنازلي المعتاد
     total_wait_seconds = 300  
     check_interval = 15       
     loops = total_wait_seconds // check_interval
@@ -684,14 +696,11 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
             time.sleep(check_interval)
             remaining_seconds = total_wait_seconds - ((i + 1) * check_interval)
             
-            # 🔄 تحديث نسبة التحميل تدريجياً في نفس الرسالة مع الوقت لتشبه لقطة شاشتك 📈
+            # تحديث وقت الانتظار كل 30 ثانية بشكل كلاسيكي منظم وثابت في نفس الرسالة 👍
             if remaining_seconds % 30 == 0 and remaining_seconds > 0:
                 try:
-                    pct = 30 + int((300 - remaining_seconds) / 300 * 60) # تزيد النسبة تدريجياً
-                    progress_markup = InlineKeyboardMarkup()
-                    progress_markup.add(InlineKeyboardButton(f"{pct}%", callback_data="none"))
-                    timer_text = f"🎰 <b>الدولة متاحة الآن وجاري الانتظار</b> 🥳\n\n{flag} {c_name}\n📱 الرقم المحجوز: <code>{phone_number}</code>\n\n🔄 جاري فحص وصول كود الـ SMS تلقائياً...\n⏱️ متبقي على وقت الحجز: {remaining_seconds} ثانية..."
-                    bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=progress_markup, parse_mode="HTML")
+                    timer_text = f"🎰 <b>تم حجز الخط بنجاح بنسبة 100%</b> 🥳\n\n{flag} {c_name}\n📱 الرقم المحجوز: <code>{phone_number}</code>\n\n🔄 جاري انتظار كود الـ SMS الحين تلقائياً...\n⏱️ <b>متبقي على وقت الانتظار: {remaining_seconds} ثانية...</b>\n⚠️ الرصيد معلق بأمان ولن يضيع مليم!"
+                    bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=None, parse_mode="HTML")
                 except: pass
 
             if is_number_banned_on_telegram(phone_number, acc_index): break
@@ -700,15 +709,13 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
             if res.get("code") == 200:
                 sms_code = res.get("data")
                 
-                # 1. تعديل نفس رسالة الصيد ونشيل منها الأزرار نهائياً عشان العميل ميعلقش 👍
                 success_text = f"✅ <b>تم شراء الرقم واستلام الكود بنجاح!</b>\n\n{flag} {c_name}\n📱 الرقم: <code>{phone_number}</code>\n💰 السعر: <b>{price}$</b>\n\n📥 الكود وصلك بالأسفل وتم تثبيته فوق 📌"
                 bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=success_text, reply_markup=None, parse_mode="HTML")
                 
-                # 2. 📌 إرسال كود الـ SMS في رسالة منفصلة مخصصة وتثبيتها تلقائياً (Pin Message) عشان تليجرام العميل يلقطه!
+                # 📌 التثبيت التلقائي الذكي لكود الـ SMS فوق في الشات علطول
                 pin_msg_text = f"✅ تم استلام الكود! • الرقم: <code>{phone_number}</code> • الدولة: {flag} {c_name}\n🔑 كود تفعيل التليجرام: <code>{sms_code}</code>"
                 sent_pin_msg = bot.send_message(user_id, pin_msg_text, parse_mode="HTML")
-                try:
-                    bot.pin_chat_message(chat_id=user_id, message_id=sent_pin_msg.message_id, disable_notification=False)
+                try: bot.pin_chat_message(chat_id=user_id, message_id=sent_pin_msg.message_id, disable_notification=False)
                 except: pass
                 
                 log_order(user_id, f"📱 {phone_number} | كود: {sms_code} | سعر: {price}$")
@@ -722,7 +729,6 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
                 return
         except: pass
     
-    # في حالة انتهاء وقت الانتظار أو الفشل
     if user_id not in USER_BALANCES: USER_BALANCES[user_id] = 0.00
     USER_BALANCES[user_id] += price
     save_data("balances")
@@ -776,7 +782,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون بنجاح.")
 
 def run_bot_safe():
-    print("🤖 تم تفعيل ميزة التعديل التفاعلي وتثبيت الكود التلقائي بنجاح طائرة... 🚀📌✨")
+    print("🤖 تم تطبيق تأثير الأنميشن السريع للحجز 10%.. 20%.. 30% بنجاح صاروخي! 🚀✨🎮")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     while True:
         try: bot.infinity_polling(timeout=20, long_polling_timeout=10)
