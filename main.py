@@ -502,18 +502,16 @@ def handle_callbacks(call):
                 
                 bot.answer_callback_query(call.id, "🔄 جاري المعالجة الحين...")
                 
-                # 🎮 البداية بـ 10% فوراً في نفس الرسالة عشان الأنميشن يبدأ طحن
                 loading_markup = InlineKeyboardMarkup()
                 loading_markup.add(InlineKeyboardButton("10%", callback_data="none"))
                 bot.edit_message_text(
                     chat_id=user_id, 
                     message_id=call.message.id, 
-                    text=f"🔄 <b>جاري فحص وحجز الرقم من السيرفر...</b>\n📱 الرقم: <code>{phone}</code>\n🌍 الدولة: {target_info['flag']} {target_info['country']}", 
+                    text=f"🔄 <b>جاري فحص وحجز الرقم من السيرفر الصيني...</b>\n📱 الرقم: <code>{phone}</code>\n🌍 الدولة: {target_info['flag']} {target_info['country']}", 
                     reply_markup=loading_markup, 
                     parse_mode="HTML"
                 )
                 
-                # تفعيل التريد الخاص بالأنميشن السريع والانتظار ⚡
                 threading.Thread(target=wait_for_sms, args=(user_id, phone, price, acc_index, call.message.id, target_info['country'], target_info['flag'])).start()
             else:
                 bot.answer_callback_query(call.id, "❌ رصيدك غير كافٍ!", show_alert=True)
@@ -670,23 +668,33 @@ def global_auto_buyer():
                 time.sleep(0.5)
             time.sleep(0.5)
 
-# ⏱️ ⚡ دالة الفحص مدمج بها نظام الأنميشن الحجز السريع الخارق (10%.. 20%.. 30%.. ورا بعض) ✨🚀
+# ⏱️ ⚡ دالة الفحص الرايقة المصلحة من غير عداد الثواني اللي طلبت تشيله الحين 🔒📌
 def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name, flag):
     acc = DURIAN_ACCOUNTS[acc_index]
     sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(SETTINGS['pid'])}&serial=2"
     
-    # 🎰 1. عمايل تأثير الحجز السريع الخاطف (10% 👈 20% 👈 30% لـ 100% في نفس الثانية) 🎮⚡
-    fake_steps = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    for step in fake_steps:
+    # 🎰 1. أنميشن الحجز السريع الخاطف (10% لـ 100% في نفس الثانية) ⚡
+    loading_steps = ["10%", "30%", "60%", "90%", "100%"]
+    for step in loading_steps:
         try:
             progress_markup = InlineKeyboardMarkup()
-            progress_markup.add(InlineKeyboardButton(f"{step}%", callback_data="none"))
-            timer_text = f"🔄 <b>جاري فحص وحجز الرقم من السيرفر الصيني...</b>\n📱 الرقم: <code>{phone_number}</code>\n🌍 الدولة: {flag} {c_name}"
+            progress_markup.add(InlineKeyboardButton(f"{step}", callback_data="none"))
+            timer_text = f"🔄 <b>جاري تجهيز الخط... {step}</b>\n📱 الرقم: <code>{phone_number}</code>"
             bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=progress_markup, parse_mode="HTML")
-            time.sleep(0.15) # سرعة الحركة الأنميشن الخاطفة ورا بعض طحن ⚡
+            time.sleep(0.3) 
         except: pass
 
-    # 🎰 2. بعد انتهاء العداد السريع.. نقلب علطول على رسالة انتظار الـ SMS الحقيقية والعد التنازلي المعتاد
+    # 🔥 🔄 التحديث المباشر: بنشيل الأزرار ونثبت النص النظيف من غير عداد الثواني عشان الشكل يبقى رايق
+    try:
+        init_timer_text = (f"🎰 <b>تم حجز الرقم بنجاح!</b>\n\n"
+                          f"🌍 <b>الدولة:</b> {flag} {c_name}\n"
+                          f"📱 <b>الرقم:</b> <code>{phone_number}</code>\n\n"
+                          f"⏳ <b>جاري فحص وصول الكود...</b>\n"
+                          f"✨ <i>يرجى الانتظار، سيتم تثبيت الكود فور وصوله تلقائياً.</i>")
+        bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=init_timer_text, reply_markup=None, parse_mode="HTML")
+    except: pass
+
+    # 🎰 2. اللوب الحقيقي لانتظار الـ SMS من الصين
     total_wait_seconds = 300  
     check_interval = 15       
     loops = total_wait_seconds // check_interval
@@ -694,14 +702,6 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
     for i in range(loops):
         try:
             time.sleep(check_interval)
-            remaining_seconds = total_wait_seconds - ((i + 1) * check_interval)
-            
-            # تحديث وقت الانتظار كل 30 ثانية بشكل كلاسيكي منظم وثابت في نفس الرسالة 👍
-            if remaining_seconds % 30 == 0 and remaining_seconds > 0:
-                try:
-                    timer_text = f"🎰 <b>تم حجز الخط بنجاح بنسبة 100%</b> 🥳\n\n{flag} {c_name}\n📱 الرقم المحجوز: <code>{phone_number}</code>\n\n🔄 جاري انتظار كود الـ SMS الحين تلقائياً...\n⏱️ <b>متبقي على وقت الانتظار: {remaining_seconds} ثانية...</b>\n⚠️ الرصيد معلق بأمان ولن يضيع مليم!"
-                    bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=None, parse_mode="HTML")
-                except: pass
 
             if is_number_banned_on_telegram(phone_number, acc_index): break
                 
@@ -712,7 +712,7 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
                 success_text = f"✅ <b>تم شراء الرقم واستلام الكود بنجاح!</b>\n\n{flag} {c_name}\n📱 الرقم: <code>{phone_number}</code>\n💰 السعر: <b>{price}$</b>\n\n📥 الكود وصلك بالأسفل وتم تثبيته فوق 📌"
                 bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=success_text, reply_markup=None, parse_mode="HTML")
                 
-                # 📌 التثبيت التلقائي الذكي لكود الـ SMS فوق في الشات علطول
+                # 📌 التثبيت التلقائي لكود الـ SMS فوق في الشات علطول
                 pin_msg_text = f"✅ تم استلام الكود! • الرقم: <code>{phone_number}</code> • الدولة: {flag} {c_name}\n🔑 كود تفعيل التليجرام: <code>{sms_code}</code>"
                 sent_pin_msg = bot.send_message(user_id, pin_msg_text, parse_mode="HTML")
                 try: bot.pin_chat_message(chat_id=user_id, message_id=sent_pin_msg.message_id, disable_notification=False)
@@ -782,7 +782,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون بنجاح.")
 
 def run_bot_safe():
-    print("🤖 تم تطبيق تأثير الأنميشن السريع للحجز 10%.. 20%.. 30% بنجاح صاروخي! 🚀✨🎮")
+    print("🤖 تم إصلاح عطل التعليق وتشغيل النسخة النفاثة بنجاح ساحق... 🚀✨📌")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     while True:
         try: bot.infinity_polling(timeout=20, long_polling_timeout=10)
