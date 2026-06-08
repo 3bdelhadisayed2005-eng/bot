@@ -299,7 +299,8 @@ def send_welcome(message):
         )
         bot.send_message(message.chat.id, admin_text, reply_markup=get_admin_dashboard_keyboard(), parse_mode="HTML")
     else:
-        welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+        # 🕸️ 𝕊ℙ𝕓...🕷️ الاسم الإنجليزي الجديد بتنسيق الشبكة والعنكبوت المتوازن الحين منور السيستم فوق الرصيد
+        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝔻𝔼ℝ 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -310,7 +311,7 @@ def handle_callbacks(call):
     if call.data == "check_join_btn":
         if check_user_joined_channel(user_id):
             bot.answer_callback_query(call.id, "✅ تم تفعيل حسابك بنجاح!", show_alert=True)
-            welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+            welcome_text = f"• <u><b>🕸️ 𝕾𝕻𝕴𝕯𝕰𝕽 𝕾𝕸𝕾 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
             bot.edit_message_text(chat_id=user_id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         else:
             bot.answer_callback_query(call.id, "❌ لسه مشركتش يا غالي! اشترك الحين.", show_alert=True)
@@ -473,7 +474,8 @@ def handle_callbacks(call):
 
     elif call.data == "back_to_main":
         bot.answer_callback_query(call.id)
-        welcome_text = f"• <u><b>Pulse-SMS - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+        # 🕸️ 𝕊ℙ𝓘...🕷️ الاسم الإنجليزي الجديد بتنسيق الشبكة والعنكبوت المتوازن الحين منور السيستم فوق الرصيد
+        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝔻𝔼ℝ 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         return
     
@@ -507,7 +509,7 @@ def handle_callbacks(call):
                 bot.edit_message_text(
                     chat_id=user_id, 
                     message_id=call.message.id, 
-                    text=f"🔄 <b>جاري فحص وحجز الرقم من السيرفر الصيني...</b>\n📱 الرقم: <code>{phone}</code>\n🌍 الدولة: {target_info['flag']} {target_info['country']}", 
+                    text=f"🔄 <b>جاري فحص وحجز الرقم من السيرفر الصيني...</b>\n📱 الرقم: <code>[ جاري التأمين... * * * * * * * * * ]</code>", 
                     reply_markup=loading_markup, 
                     parse_mode="HTML"
                 )
@@ -668,33 +670,29 @@ def global_auto_buyer():
                 time.sleep(0.5)
             time.sleep(0.5)
 
-# ⏱️ ⚡ دالة الفحص الرايقة المصلحة من غير عداد الثواني اللي طلبت تشيله الحين 🔒📌
 def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name, flag):
     acc = DURIAN_ACCOUNTS[acc_index]
     sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(SETTINGS['pid'])}&serial=2"
     
-    # 🎰 1. أنميشن الحجز السريع الخاطف (10% لـ 100% في نفس الثانية) ⚡
     loading_steps = ["10%", "30%", "60%", "90%", "100%"]
     for step in loading_steps:
         try:
             progress_markup = InlineKeyboardMarkup()
             progress_markup.add(InlineKeyboardButton(f"{step}", callback_data="none"))
-            timer_text = f"🔄 <b>جاري تجهيز الخط... {step}</b>\n📱 الرقم: <code>{phone_number}</code>"
+            timer_text = f"🔄 <b>جاري تجهيز الخط... {step}</b>\n📱 الرقم: <code>[ جاري التأمين... * * * * * * * * * ]</code>"
             bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=timer_text, reply_markup=progress_markup, parse_mode="HTML")
             time.sleep(0.3) 
         except: pass
 
-    # 🔥 🔄 التحديث المباشر: بنشيل الأزرار ونثبت النص النظيف من غير عداد الثواني عشان الشكل يبقى رايق
     try:
         init_timer_text = (f"🎰 <b>تم حجز الرقم بنجاح!</b>\n\n"
                           f"🌍 <b>الدولة:</b> {flag} {c_name}\n"
-                          f"📱 <b>الرقم:</b> <code>{phone_number}</code>\n\n"
-                          f"⏳ <b>جاري فحص وصول الكود...</b>\n"
+                          f"📱 <b>الرقم المحجوز لك:</b> <code>{phone_number}</code>\n\n"
+                          f"⏳ <b>جاري فحص وصول الكود الحين...</b>\n"
                           f"✨ <i>يرجى الانتظار، سيتم تثبيت الكود فور وصوله تلقائياً.</i>")
         bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=init_timer_text, reply_markup=None, parse_mode="HTML")
     except: pass
 
-    # 🎰 2. اللوب الحقيقي لانتظار الـ SMS من الصين
     total_wait_seconds = 300  
     check_interval = 15       
     loops = total_wait_seconds // check_interval
@@ -712,7 +710,6 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
                 success_text = f"✅ <b>تم شراء الرقم واستلام الكود بنجاح!</b>\n\n{flag} {c_name}\n📱 الرقم: <code>{phone_number}</code>\n💰 السعر: <b>{price}$</b>\n\n📥 الكود وصلك بالأسفل وتم تثبيته فوق 📌"
                 bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=success_text, reply_markup=None, parse_mode="HTML")
                 
-                # 📌 التثبيت التلقائي لكود الـ SMS فوق في الشات علطول
                 pin_msg_text = f"✅ تم استلام الكود! • الرقم: <code>{phone_number}</code> • الدولة: {flag} {c_name}\n🔑 كود تفعيل التليجرام: <code>{sms_code}</code>"
                 sent_pin_msg = bot.send_message(user_id, pin_msg_text, parse_mode="HTML")
                 try: bot.pin_chat_message(chat_id=user_id, message_id=sent_pin_msg.message_id, disable_notification=False)
@@ -782,7 +779,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون بنجاح.")
 
 def run_bot_safe():
-    print("🤖 تم إصلاح عطل التعليق وتشغيل النسخة النفاثة بنجاح ساحق... 🚀✨📌")
+    print("🕸️🕷️ تم قفل براند العنكبوت الهجين مكس عربي وإنجليزي بنجاح... 🚀✨📌")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     while True:
         try: bot.infinity_polling(timeout=20, long_polling_timeout=10)
