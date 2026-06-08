@@ -299,8 +299,7 @@ def send_welcome(message):
         )
         bot.send_message(message.chat.id, admin_text, reply_markup=get_admin_dashboard_keyboard(), parse_mode="HTML")
     else:
-        # 🕸️ 𝕊ℙ𝕓...🕷️ الاسم الإنجليزي الجديد بتنسيق الشبكة والعنكبوت المتوازن الحين منور السيستم فوق الرصيد
-        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝔻𝔼ℝ 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝓓𝓔𝓡 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -311,7 +310,7 @@ def handle_callbacks(call):
     if call.data == "check_join_btn":
         if check_user_joined_channel(user_id):
             bot.answer_callback_query(call.id, "✅ تم تفعيل حسابك بنجاح!", show_alert=True)
-            welcome_text = f"• <u><b>🕸️ 𝕾𝕻𝕴𝕯𝕰𝕽 𝕾𝕸𝕾 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+            welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝓓𝓔𝓡 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
             bot.edit_message_text(chat_id=user_id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         else:
             bot.answer_callback_query(call.id, "❌ لسه مشركتش يا غالي! اشترك الحين.", show_alert=True)
@@ -474,8 +473,7 @@ def handle_callbacks(call):
 
     elif call.data == "back_to_main":
         bot.answer_callback_query(call.id)
-        # 🕸️ 𝕊ℙ𝓘...🕷️ الاسم الإنجليزي الجديد بتنسيق الشبكة والعنكبوت المتوازن الحين منور السيستم فوق الرصيد
-        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝔻𝔼ℝ 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
+        welcome_text = f"• <u><b>🕸️ 𝕊ℙ𝓘𝓓𝓔𝓡 𝕊𝕄𝕊 🕷️ - Auto Hunting Bot</b></u> •\n\n💰 <b>رصيدك الحالي:</b> {get_user_balance(user_id):.2f} $\n\n🆔 الـ ID الخاص بك: <code>{user_id}</code>"
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=welcome_text, reply_markup=get_main_keyboard(), parse_mode="HTML")
         return
     
@@ -483,6 +481,7 @@ def handle_callbacks(call):
         current_time = time.time()
         last_purchase_time = USER_PURCHASE_COOLDOWN.get(user_id, 0)
         
+        # ⏱️ الحظر الفوري للإسبام: الزبون مجبر ينتظر 5 ثوانٍ بين محاولات حجز الأرقام
         if current_time - last_purchase_time < 5:
             bot.answer_callback_query(call.id, "⚠️ يرجى الانتظار 5 ثوانٍ بين محاولات الشراء.", show_alert=True)
             return
@@ -495,14 +494,12 @@ def handle_callbacks(call):
             target_info = active_hunted_numbers[phone]
             price = float(target_info['price'])
             
+            # 💸 التعديل الأمني: نتحقق من رصيده أولاً، لكن لا نخصم شيئاً الحين!
             if get_user_balance(user_id) >= price:
                 USER_PURCHASE_COOLDOWN[user_id] = current_time
                 del active_hunted_numbers[phone]
                 
-                USER_BALANCES[user_id] -= price
-                save_data("balances")
-                
-                bot.answer_callback_query(call.id, "🔄 جاري المعالجة الحين...")
+                bot.answer_callback_query(call.id, "🔄 جاري التأمين وبدء الفحص...")
                 
                 loading_markup = InlineKeyboardMarkup()
                 loading_markup.add(InlineKeyboardButton("10%", callback_data="none"))
@@ -520,7 +517,7 @@ def handle_callbacks(call):
         else:
             bot.answer_callback_query(call.id, "❌ الرقم تم بيعه أو انتهت صلاحيته!", show_alert=True)
 
-# --- ⚙️ معالجة الرسائل النصية ---
+# --- ⚙️ معالجة الرسائل النصية المصلحة من أخطاء الـ Syntax بالملي الحين جوة السيستم ---
 @bot.message_handler(func=lambda msg: msg.from_user.id in admin_state)
 def handle_states(message):
     user_id = message.from_user.id
@@ -564,7 +561,7 @@ def handle_states(message):
         try:
             t_id = int(text)
             t_bal = get_user_balance(t_id)
-            ban_text = "⚠️ محظور" if t_id in BANNED_USERS else "✅ نشط"
+            ban_text = "⚠️ محظور" if t_id in BANNED_USERS else "🟢 نشط"
             info_msg = f"👤 **بيانات حساب الزبون:**\n\n• رصيده الحالى: **{t_bal:.2f} $**\n• حالة الحساب: **{ban_text}**"
             bot.send_message(user_id, info_msg, reply_markup=get_user_manage_keyboard(t_id))
         except: bot.send_message(user_id, "❌ الـ ID غير صحيح.")
@@ -670,6 +667,7 @@ def global_auto_buyer():
                 time.sleep(0.5)
             time.sleep(0.5)
 
+# ⏱️ ⚡ دالة الفحص الذكية المعدلة: الخصم التلقائي والفعلي للرصيد يحصل بعد وصول كود الـ SMS بنجاح فقط! الحين مقفلة 🔒📌
 def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name, flag):
     acc = DURIAN_ACCOUNTS[acc_index]
     sms_url = f"https://api.durianrcs.com/out/ext_api/getMsg?name={acc[0]}&ApiKey={acc[1]}&pn={phone_number}&pid={str(SETTINGS['pid'])}&serial=2"
@@ -707,6 +705,11 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
             if res.get("code") == 200:
                 sms_code = res.get("data")
                 
+                # 💸 لحظة استلام الكود بنجاح: الحين يحصل الخصم الحقيقي والأكيد من محفظة العميل! 🔒💰
+                if user_id not in USER_BALANCES: USER_BALANCES[user_id] = 0.00
+                USER_BALANCES[user_id] = max(0.00, USER_BALANCES[user_id] - price)
+                save_data("balances")
+                
                 success_text = f"✅ <b>تم شراء الرقم واستلام الكود بنجاح!</b>\n\n{flag} {c_name}\n📱 الرقم: <code>{phone_number}</code>\n💰 السعر: <b>{price}$</b>\n\n📥 الكود وصلك بالأسفل وتم تثبيته فوق 📌"
                 bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=success_text, reply_markup=None, parse_mode="HTML")
                 
@@ -726,13 +729,11 @@ def wait_for_sms(user_id, phone_number, price, acc_index, status_msg_id, c_name,
                 return
         except: pass
     
-    if user_id not in USER_BALANCES: USER_BALANCES[user_id] = 0.00
-    USER_BALANCES[user_id] += price
-    save_data("balances")
+    # ❌ لو موصلش الكود وانتهى الوقت: الرصيد أصلاً مخصمنهوش من الأول، فبنلغي الرقم أوتوماتيك مجاناً تماماً! 😎🍿
     release_bad_number(phone_number, acc_index)
     SYSTEM_STATS["failed_orders"] += 1
     
-    fail_text = f"❌ <b>انتهى وقت الانتظار لعدم وصول الكود للرقم:</b>\n<code>{phone_number}</code>\n\n💰 تم فك تعليق المبلغ (${price:.2f}) ورصيدك في أمان بمحفظتك بالكامل مجاناً!"
+    fail_text = f"❌ <b>انتهى وقت الانتظار لعدم وصول الكود للرقم:</b>\n<code>{phone_number}</code>\n\n💰 لم يتم خصم أي مبلغ من رصيدك لعدم استلام كود التفعيل، محفظتك في أمان كامل!"
     try: bot.edit_message_text(chat_id=user_id, message_id=status_msg_id, text=fail_text, reply_markup=None, parse_mode="HTML")
     except: pass
 
@@ -779,7 +780,7 @@ def process_admin_broadcast(message):
     bot.send_message(ADMIN_ID, f"✅ تم الإرسال لـ {count} زبون بنجاح.")
 
 def run_bot_safe():
-    print("🕸️🕷️ تم قفل براند العنكبوت الهجين مكس عربي وإنجليزي بنجاح... 🚀✨📌")
+    print("🕸️🕷️ تم قفل منطق الخصم الآمن والـ Cooldown المظبوط على النسخة الـ 700 سطر بنجاح... 🚀✨📌")
     threading.Thread(target=global_auto_buyer, daemon=True).start()
     while True:
         try: bot.infinity_polling(timeout=20, long_polling_timeout=10)
